@@ -1,0 +1,61 @@
+\documentclass[12pt,letterpaper, onecolumn]{exam}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage[dvipsnames]{xcolor}
+\graphicspath{ {./images/} }
+\lhead{Mustafa Rashid\\}
+\rhead{Homework 2: Relational DB Design\\}
+\chead{\hline} 
+\thispagestyle{empty} 
+\newcommand*{\setdef}[1]{\left\{#1 \right\}} 
+\renewcommand{\thepartno}{\Alph{partno}} % Force uppercase letters
+\renewcommand{\partlabel}{\thepartno.}    % Format as A. B. C.
+
+\begin{document}
+\begingroup  
+\noindent\LARGE CIS 5500: Database and Information Systems\\
+\noindent\LARGE Homework 2: Relational DB Design\\
+\noindent\large \today\\
+\noindent\large Mustafa Rashid\par
+\noindent\large Spring 2026\par
+\endgroup
+\rule{\textwidth}{0.4pt}
+\pointsdroppedatright
+\printanswers
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}  
+
+\begin{questions}
+  \question \textbf{Question 1 (30 points)}
+  \begin{parts}
+    \part \textbf{(20 points)}
+     \begin{center}
+       \includegraphics[scale=0.25]{hw2_q1.png}
+     \end{center}
+    \part \textbf{(5 points)}
+    \begin{solution}
+      It is possible to have a start or end stop that does not have a TransportLine assigned to it. We can add a not exists constraint to the stations
+      table to check that a station can be a stop if and only if it exists in the TransportLine table \textcolor{red}{double check this!}
+    \end{solution}
+    \part \textbf{(5 points)}
+    \begin{solution}
+      Add an attribute to the relationship \texttt{serves} that is called \texttt{no\_of\_platforms}. We also add an attribute to the Station entity set 
+      \texttt{maximum\_no\_of\_platforms}. We add a constraint that ensures that \texttt{no\_of\_platforms} is less than or equal to \texttt{maximum\_no\_of\_platforms}.
+    \end{solution}
+  \end{parts}
+  \question \textbf{Question 2 (20 points)}\begin{parts}
+    \part \textbf{12 points}
+    \part \textbf{4 points}
+    \part \textbf{4 points}
+  \end{parts}
+  \question \textbf{Question 3 (40 points)}\begin{parts}
+    \part \textbf{4 points}
+    \part \textbf{4 points}
+    \part \textbf{6 points}
+    \part \textbf{5 points}
+    \part \textbf{2 points}
+    \part \textbf{2 points}
+    \part \textbf{12 points}
+    \part \textbf{5 points}
+  \end{parts}
+\end{questions}
+\end{document}
