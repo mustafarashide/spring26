@@ -1,0 +1,71 @@
+-- QUESTION ONE
+/*
+SELECT DISTINCT C.person_id,P.name
+FROM cast_in C,people P
+WHERE C.person_id=P.id AND
+      lower(name) LIKE '%john%' AND
+      SUBSTRING(lower(name),2,1) NOT IN ('a','e','i','o','u') AND
+      LENGTH(name) BETWEEN 10 AND 15
+ORDER BY name;
+ */
+-- QUESTION TWO
+SELECT DISTINCT C.person_id,P.name,P.death_year,M.id,M.title,M.release_year
+FROM people P, cast_in C, movies M
+WHERE C.person_id=P.id AND
+      C.movie_id=M.id AND
+      P.death_year<M.release_year AND P.death_year IS NOT NULL
+ORDER BY P.name,M.title DESC;
+-- QUESTION THREE
+/*
+SELECT M.id,P.name,COUNT(*) as num_movies
+FROM movies M, people P, crew_in C
+WHERE C.person_id=P.id AND
+      M.rating>8 AND
+      M.release_year>2015 AND
+      C.job LIKE 'director'
+GROUP BY M.id,P.name
+ORDER BY COUNT(*) DESC;
+ */
+-- QUESTION FOUR
+/*
+SELECT M.title,
+       COUNT(CP.id) AS num_crew,
+       STRING_AGG(CP.name, '; ' ORDER BY CP.name) AS CREW
+FROM people P, movies M, crew_in C, known_for K, people CP
+WHERE K.movie_id = M.id
+  AND K.person_id = P.id
+  AND C.movie_id = M.id
+  AND C.person_id = CP.id
+  AND P.name = 'Wes Anderson'
+  AND M.num_ratings > 200000
+GROUP BY M.id, M.title
+ORDER BY M.title, num_crew DESC;
+*/
+-- QUESTION FIVE
+/*
+SELECT M.id, M.title, ROUND( AVG( COALESCE( P.death_year - P.birth_year + 1, EXTRACT(YEAR FROM CURRENT_DATE)::INT - P.birth_year + 1 ) ) ) AS average_production_age
+FROM movies M,
+     people P,
+     movie_genres MG,
+     (
+        SELECT movie_id, person_id FROM crew_in
+        UNION
+        SELECT movie_id, person_id FROM cast_in
+     ) MC
+WHERE M.id = MG.movie_id
+  AND MG.genre = 'Drama'
+  AND M.id = MC.movie_id
+  AND P.id = MC.person_id
+GROUP BY M.id, M.title
+HAVING
+    AVG(
+        COALESCE(
+            P.death_year - P.birth_year + 1,
+            EXTRACT(YEAR FROM CURRENT_DATE)::INT - P.birth_year + 1
+        )
+    ) < 30
+ORDER BY
+    average_production_age,
+    M.title;
+*/
+

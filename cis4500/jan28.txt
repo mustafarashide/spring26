@@ -1,0 +1,55 @@
+useful sql features
+- expressions: do computation over scalars (int, real, string) in SELECT or WHERE
+- strings: comparison operators(=, <,>,<>,...), use single quotes, special comparision operator: LIKE (e.g. '%Smith' where % is a wild card)
+- ordering: ascending unless you specifiy DESC, ties broekn by the second attribute in the ORDER BY list, etc. (lexicographical ordering)
+
+summary
+- SELECT [DISTINCT] {list of attributes}
+- FROM {list of tables}
+- 
+
+Meaning (semantics) of SQL Queries
+- SQL queries
+SELECT a_1,a_2,...,a_k
+FROM R_1,R_2,...,R_n
+WHERE conditions
+
+- nested loops
+Answer = {}
+for x_1 in R_1
+    for x_2 in R_2
+    ...
+    for x_n in R_n do
+        if conditions
+            then Answer = Answer U {(a_1,...,a_k}
+return Answer
+
+- unintuitive SQLism -> corss product with empty set 
+
+- operators: union, intersect, minus remove duplicates unless ALL is used 
+
+- complex SQL queries:
+1. subqueries:IN/NOT IN, ALL/ANY
+2. subqueries:EXISTS, NOT EXISTS
+
+subqueries:
+- a query can occur in the WHERE clause of a query 
+- uncorrelated: independent of outer query
+
+find all sids in cids where there is an sid=1 (can be done with a CTE or a temporary table)
+SELECT sid
+FROM Takes
+WHERE cid IN
+    (SELECT sid
+     FROM Takes
+     WHERE sid=1)
+
+- correlated: refers to variable in the outer query
+
+IN/NOT IN
+- {attr} IN {subquery}: "students who have taken a course that was taught at some point by prof. marcus"
+- {attr} NOT IN {subquery}: "students who have taken a course that has never been taught by prof marcus"
+
+ALL/ANY
+- {attr}{op} ALL {subqeury} - universaly quantification: "find students who are expecting the highest grade"
+- {attr}{op} ANY {subquery} - existential quantification: "find students who are not expecting the lowest grade"
