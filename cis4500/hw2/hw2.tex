@@ -111,10 +111,40 @@
         EndDate DATE
         );
       \end{lstlisting}
-
     \end{solution}
     \part \textbf{4 points}
+    \begin{solution}
+      We can create an assertion as follows
+      \begin{lstlisting}
+        CREATE ASSERTION exhibition_cardinality
+CHECK (
+    NOT EXISTS (
+        SELECT ExhibitionID
+        FROM DisplayedIn
+        GROUP BY ExhibitionID
+        HAVING COUNT(*) NOT BETWEEN 5 AND 20
+    )
+);
+\end{lstlisting}
+    \end{solution}
     \part \textbf{4 points}
+    \begin{solution}
+      We change the cardinality on the Artists entity set from \(0..*\) to \(1..*\). We also add the following assertion
+      \begin{lstlisting}
+CREATE ASSERTION artist_has_artwork
+CHECK (
+  NOT EXISTS (
+    SELECT *
+    FROM Artists A
+    WHERE NOT EXISTS (
+      SELECT *
+      FROM Artworks W
+      WHERE W.CreatorID = A.ArtistID
+    )
+  )
+);
+\end{lstlisting}
+    \end{solution}
   \end{parts}
   \question \textbf{Question 3 (40 points)}\begin{parts}
     \part \textbf{4 points}
