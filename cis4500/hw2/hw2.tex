@@ -57,15 +57,24 @@
        \includegraphics[scale=0.25]{hw2_q1.png}
      \end{center}
     \part \textbf{(5 points)}
-    \begin{solution}
-      It is possible to have a start or end stop that does not have a TransportLine assigned to it. We can add a not exists constraint to the stations
-      table to check that a station can be a stop if and only if it exists in the TransportLine table \textcolor{red}{double check this!}
-    \end{solution}
+\begin{solution}
+A TravelSegment could start or end at a Station that is not served by its associated TransportLine. 
+This would be valid in the ER diagram because there is no constraint requiring the start and end 
+stations of a TravelSegment to be among the stations served by that TransportLine.
+
+To enforce this constraint, we must require that the start and end stations of a TravelSegment 
+appear in the Serves relationship with the same TransportLine. In other words, a TravelSegment 
+may only start and end at stations that are served by its associated TransportLine.
+\end{solution}
     \part \textbf{(5 points)}
-    \begin{solution}
-      Add an attribute to the relationship \texttt{serves} that is called \texttt{no\_of\_platforms}. We also add an attribute to the Station entity set 
-      \texttt{maximum\_no\_of\_platforms}. We add a constraint that ensures that \texttt{no\_of\_platforms} is less than or equal to \texttt{maximum\_no\_of\_platforms}.
-    \end{solution}
+\begin{solution}
+Add an attribute to the relationship \texttt{Serves} called \texttt{no\_of\_platforms}. 
+Add an attribute to the Station entity set called \texttt{maximum\_no\_of\_platforms}. 
+
+We then add a constraint that, for each Station, the sum of \texttt{no\_of\_platforms} 
+across all TransportLines assigned to that Station does not exceed\\
+\texttt{maximum\_no\_of\_platforms}.
+\end{solution}
   \end{parts}
 
   \pagebreak
@@ -112,6 +121,7 @@
         );
       \end{lstlisting}
     \end{solution}
+    \pagebreak
     \part \textbf{4 points}
     \begin{solution}
       We can create an assertion as follows
@@ -146,15 +156,40 @@ CHECK (
 \end{lstlisting}
     \end{solution}
   \end{parts}
+  \pagebreak
   \question \textbf{Question 3 (40 points)}\begin{parts}
     \part \textbf{4 points}
+    \begin{solution}
+      No they cannot.\\If they did then the functional dependencies PassengerID \(\rightarrow\) PassengerEmail and PassengerEmail \(\rightarrow\) PassengerID would not hold.
+    \end{solution}
     \part \textbf{4 points}
+    \begin{solution}
+      Yes. \textcolor{red}{FINISH ME!}
+    \end{solution}
     \part \textbf{6 points}
+    \begin{solution}
+      passengerID,trainNO and passengerEmail, TrainNO \textcolor{red}{FINISH ME!}
+    \end{solution}
     \part \textbf{5 points}
+    \begin{solution}
+      \textcolor{red}{FINISH ME!}
+    \end{solution}
     \part \textbf{2 points}
+    \begin{solution}
+      \textcolor{red}{FINISH ME!}
+    \end{solution}
     \part \textbf{2 points}
+    \begin{solution}
+      \textcolor{red}{FINISH ME!}
+    \end{solution}
     \part \textbf{12 points}
+    \begin{solution}
+      \textcolor{red}{FINISH ME!}
+    \end{solution}
     \part \textbf{5 points}
+    \begin{solution}
+      \textcolor{red}{FINISH ME!}
+    \end{solution}
   \end{parts}
 \end{questions}
 \end{document}
