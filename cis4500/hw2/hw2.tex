@@ -1,6 +1,7 @@
 \documentclass[12pt,letterpaper, onecolumn]{exam}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{listings}
 \usepackage[dvipsnames]{xcolor}
 \graphicspath{ {./images/} }
 \lhead{Mustafa Rashid\\}
@@ -22,7 +23,31 @@
 \rule{\textwidth}{0.4pt}
 \pointsdroppedatright
 \printanswers
-\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}  
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}
+
+% SQL listing from https://gist.githubusercontent.com/vivngo/e37e1c7b79bf7e8b910c6566c59c46be/raw/db8723fc80c8b1b01665851106dba2f370b5d865/code.tex
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{language=SQL,
+  basicstyle={\small\ttfamily},
+  belowskip=3mm,
+  breakatwhitespace=true,
+  breaklines=true,
+  classoffset=0,
+  columns=flexible,
+  commentstyle=\color{dkgreen},
+  framexleftmargin=0.25em,
+  frameshape={}{}{}{}, %To remove to vertical lines on left, set `frameshape={}{}{}{}`
+  keywordstyle=\color{blue},
+  numbers=none, %If you want line numbers, set `numbers=left`
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  stringstyle=\color{mauve},
+  tabsize=3,
+  xleftmargin =1em
+}
 
 \begin{questions}
   \question \textbf{Question 1 (30 points)}
@@ -42,8 +67,52 @@
       \texttt{maximum\_no\_of\_platforms}. We add a constraint that ensures that \texttt{no\_of\_platforms} is less than or equal to \texttt{maximum\_no\_of\_platforms}.
     \end{solution}
   \end{parts}
+
+  \pagebreak
+
   \question \textbf{Question 2 (20 points)}\begin{parts}
     \part \textbf{12 points}
+    \begin{solution}\\
+      \begin{lstlisting}
+        CREATE TABLE Artists(
+        ArtistID INT PRIMARY KEY,
+        Name VARCHAR(50) NOT NULL,
+        Nationality VARCHAR(50) NOT NULL,
+        BirthYear INT(4) NOT NULL
+        );
+
+        CREATE TABLE Customers(
+        CustomerID INT PRIMARY KEY,
+        Name VARCHAR(50) NOT NULL,
+        Email VARCHAR(100) NOT NULL
+        );
+
+        CREATE TABLE Artworks(
+        ArtworkID INT PRIMARY KEY,
+        OwnerID INT FOREIGN KEY REFERENCES Customers(CustomerID),
+        CreatorID INT FOREIGN KEY REFERENCES Artists(ArtistID),
+        Title VARCHAR(50) NOT NULL,
+        AYear INT(4),
+        Medium VARCHAR(50)
+        );
+
+        CREATE TABLE Exhibitions(
+        ExhibitionID INT PRIMARY KEY,
+        ExhibitionName VARCHAR(100) NOT NULL
+        );
+
+        CREATE TABLE DisplayedIn(
+        ArtworkID INT,
+        ExhibitionID INT,
+        PRIMARY KEY (ArtworkID, ExhibitionID),
+        FOREIGN KEY (ArtworkID) REFERENCES Artworks(ArtworkID),
+        FOREIGN KEY (ExhibitionID) REFERENCES Exhibitions(ExhibitionID),
+        StartDate DATE,
+        EndDate DATE
+        );
+      \end{lstlisting}
+
+    \end{solution}
     \part \textbf{4 points}
     \part \textbf{4 points}
   \end{parts}
