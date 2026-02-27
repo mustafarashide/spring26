@@ -190,29 +190,30 @@ the right-hand side attribute is a member of some candidate key.
 \part \textbf{12 points}
 \begin{solution}
 Applying the 3NF decomposition algorithm to $F$ (already a minimal cover):
-
 \begin{itemize}
     \item $\texttt{TrainNo} \to \texttt{DepartureDate, ConductorID}$: create $R_1$
     \item $\texttt{PassengerID} \to \texttt{PassengerEmail}$: create $R_2$
-    \item $\texttt{PassengerEmail} \to \texttt{PassengerID}$: $R_2$ already contains \texttt{PassengerEmail, PassengerID} --- \textbf{skip}
+    \item $\texttt{PassengerEmail} \to \texttt{PassengerID}$: $R_2$ already contains \texttt{PassengerEmail, PassengerID} so we skip this functional dependency
     \item $\texttt{TrainNo, PassengerID} \to \texttt{SeatNo, BaggageQty}$: create $R_3$
 \end{itemize}
 
-\noindent $R_3$ contains \{\texttt{TrainNo, PassengerID}\}, a candidate key of $R$ --- no additional relation needed.
+\noindent $R_3$ contains \{\texttt{TrainNo, PassengerID}\}, a candidate key of $R$ meaning that we do not need any additional relations.
 \begin{itemize}
-    \item $R_1$(\underline{\texttt{TrainNo}}, \texttt{DepartureDate}, \texttt{ConductorID})
+
+  After performing the algorithm we get the following decomposed relations \(R_i\) each with with a candidate key and a set of preserved functional dependencies.
+    \item $R_1$(\texttt{TrainNo}, \texttt{DepartureDate}, \texttt{ConductorID})
     \begin{itemize}
         \item \textbf{Candidate Key:} \{\texttt{TrainNo}\}
         \item \textbf{FDs Preserved:} $\texttt{TrainNo} \to \texttt{DepartureDate, ConductorID}$
     \end{itemize}
 
-    \item $R_2$(\underline{\texttt{PassengerID}}, \texttt{PassengerEmail})
+    \item $R_2$({\texttt{PassengerID}, \texttt{PassengerEmail})
     \begin{itemize}
         \item \textbf{Candidate Keys:} \{\texttt{PassengerID}\}, \{\texttt{PassengerEmail}\}
         \item \textbf{FDs Preserved:} $\texttt{PassengerID} \leftrightarrow \texttt{PassengerEmail}$
     \end{itemize}
 
-    \item $R_3$(\underline{\texttt{TrainNo, PassengerID}}, \texttt{SeatNo}, \texttt{BaggageQty})
+  \item $R_3$(\texttt{TrainNo}, \texttt{PassengerID}, \texttt{SeatNo}, \texttt{BaggageQty})
     \begin{itemize}
         \item \textbf{Candidate Key:} \{\texttt{TrainNo, PassengerID}\}
         \item \textbf{FDs Preserved:} $\texttt{TrainNo, PassengerID} \to \texttt{SeatNo, BaggageQty}$
@@ -225,9 +226,9 @@ Applying the 3NF decomposition algorithm to $F$ (already a minimal cover):
 Yes, all three relations are in BCNF. For every \(X \to Y\) in \(F\), either \(X \to Y\) is trivial or \(X\) is a superkey:
 
 \begin{itemize}
-    \item \(R_1\)(TrainNo, DepartureDate, ConductorID): key = \{TrainNo\}. Both TrainNo \(\to\) DepartureDate and TrainNo \(\to\) ConductorID have TrainNo as LHS, which is a superkey. 
-    \item \(R_2\)(PassengerID, PassengerEmail): keys = \{PassengerID\}, \{PassengerEmail\}. PassengerID \(\to\) PassengerEmail has superkey LHS, and PassengerEmail \(\to\) PassengerID has superkey LHS. 
-    \item \(R_3\)(TrainNo, PassengerID, SeatNo, BaggageQty): key = \{TrainNo, PassengerID\}. Both (TrainNo, PassengerID) \(\to\) SeatNo and (TrainNo, PassengerID) \(\to\) BaggageQty have the full key as LHS. 
+  \item $R_1$(\texttt{TrainNo}, \texttt{DepartureDate}, \texttt{ConductorID}) with key \texttt{TrainNo}. \\\texttt{TrainNo \(\to\) DepartureDate} and \texttt{TrainNo}\(\to\)\texttt{ConductorID} have \texttt{TrainNo} as LHS, which is a superkey. 
+  \item $R_2$({\texttt{PassengerID}, \texttt{PassengerEmail}) with keys\\  \texttt{PassengerID, PassengerEmail}. \texttt{PassengerID} \(\to\) \texttt{PassengerEmail} has superkey LHS, and\\ \texttt{PassengerEmail}\(\to\)\texttt{PassengerID} has superkey LHS. 
+    \item $R_3$(\texttt{TrainNo}, \texttt{PassengerID}, \texttt{SeatNo}, \texttt{BaggageQty}) with key = \texttt{TrainNo, PassengerID}. Both \texttt{TrainNo, PassengerID} \(\to\) \texttt{SeatNo} and\\ \texttt{TrainNo, PassengerID} \(\to\) \texttt{BaggageQty} have the full key as LHS. 
 \end{itemize}
 \end{solution}
   \end{parts}
