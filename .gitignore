@@ -1,7 +1,5 @@
 cs355/
 .DS_Store
-*.png
-*.jpg
 *.svg
 *.synctex.gz
 *.log
