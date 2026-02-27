@@ -187,36 +187,38 @@ the right-hand side attribute is a member of some candidate key.
 \begin{solution}
   No, this decomposition does not have a lossless join. \begin{center}\(R_1 \cap R_2 =\) \{PassengerID\},\end{center} which is neither a superkey of \(R_1\) nor of \(R_2\) (PassengerID alone does not determine DepartureDate or ConductorID, nor SeatNo or BaggageQty), so the lossless-join condition fails. 
 \end{solution}
-
 \part \textbf{12 points}
 \begin{solution}
+Applying the 3NF decomposition algorithm to $F$ (already a minimal cover):
 
-\(F = \{\) TrainNo \(\to\) DepartureDate, TrainNo \(\to\) ConductorID, PassengerID \(\to\) PassengerEmail, PassengerEmail \(\to\) PassengerID, (TrainNo, PassengerID) \(\to\) SeatNo, (TrainNo, PassengerID) \(\to\) BaggageQty \(\}\)
+\begin{itemize}
+    \item $\texttt{TrainNo} \to \texttt{DepartureDate, ConductorID}$: create $R_1$
+    \item $\texttt{PassengerID} \to \texttt{PassengerEmail}$: create $R_2$
+    \item $\texttt{PassengerEmail} \to \texttt{PassengerID}$: $R_2$ already contains \texttt{PassengerEmail, PassengerID} --- \textbf{skip}
+    \item $\texttt{TrainNo, PassengerID} \to \texttt{SeatNo, BaggageQty}$: create $R_3$
+\end{itemize}
 
-\(R\)(TrainNo, PassengerID, PassengerEmail, DepartureDate, ConductorID, SeatNo, BaggageQty)
+\noindent $R_3$ contains \{\texttt{TrainNo, PassengerID}\}, a candidate key of $R$ --- no additional relation needed.
+\begin{itemize}
+    \item $R_1$(\underline{\texttt{TrainNo}}, \texttt{DepartureDate}, \texttt{ConductorID})
+    \begin{itemize}
+        \item \textbf{Candidate Key:} \{\texttt{TrainNo}\}
+        \item \textbf{FDs Preserved:} $\texttt{TrainNo} \to \texttt{DepartureDate, ConductorID}$
+    \end{itemize}
 
-i=0: \(R_1\)(TrainNo, DepartureDate), \(F_1 = \{\) TrainNo \(\to\) DepartureDate \(\}\) \\
-i=1: \(R_2\)(TrainNo, ConductorID), \(F_2 = \{\) TrainNo \(\to\) ConductorID \(\}\) \\
-i=2: \(R_3\)(PassengerID, PassengerEmail), \(F_3 = \{\) PassengerID \(\to\) PassengerEmail, PassengerEmail \(\to\) PassengerID \(\}\) \\
-\phantom{i=2: }PassengerEmail \(\to\) PassengerID: \(R_3\) already contains \{PassengerEmail, PassengerID\} --- skip \\
-i=3: \(R_4\)(TrainNo, PassengerID, SeatNo), \(F_4 = \{\) (TrainNo, PassengerID) \(\to\) SeatNo \(\}\) \\
-i=4: \(R_5\)(TrainNo, PassengerID, BaggageQty), \(F_5 = \{\) (TrainNo, PassengerID) \(\to\) BaggageQty \(\}\)
+    \item $R_2$(\underline{\texttt{PassengerID}}, \texttt{PassengerEmail})
+    \begin{itemize}
+        \item \textbf{Candidate Keys:} \{\texttt{PassengerID}\}, \{\texttt{PassengerEmail}\}
+        \item \textbf{FDs Preserved:} $\texttt{PassengerID} \leftrightarrow \texttt{PassengerEmail}$
+    \end{itemize}
 
-\medskip
-\noindent Merge \(R_1, R_2\) (same key \{TrainNo\}) \(\to\) \(R_1\)(TrainNo, DepartureDate, ConductorID), \(F_1 = \{\) TrainNo \(\to\) DepartureDate, TrainNo \(\to\) ConductorID \(\}\) \\
-Merge \(R_4, R_5\) (same key \{TrainNo, PassengerID\}) \(\to\) \(R_4\)(TrainNo, PassengerID, SeatNo, BaggageQty), \(F_4 = \{\) (TrainNo, PassengerID) \(\to\) SeatNo, (TrainNo, PassengerID) \(\to\) BaggageQty \(\}\)
-
-\medskip
-\noindent \(R_4\) contains \{TrainNo, PassengerID\}, a candidate key of \(R\) --- no additional relation needed.
-
-\medskip
-\noindent\textbf{Output:} \\
-\(R_1\)(TrainNo, DepartureDate, ConductorID), \(F_1 = \{\) TrainNo \(\to\) DepartureDate, TrainNo \(\to\) ConductorID \(\}\) \\
-\(R_2\)(PassengerID, PassengerEmail), \(F_2 = \{\) PassengerID \(\to\) PassengerEmail, PassengerEmail \(\to\) PassengerID \(\}\) \\
-\(R_3\)(TrainNo, PassengerID, SeatNo, BaggageQty), \(F_3 = \{\) (TrainNo, PassengerID) \(\to\) SeatNo, (TrainNo, PassengerID) \(\to\) BaggageQty \(\}\)
-
+    \item $R_3$(\underline{\texttt{TrainNo, PassengerID}}, \texttt{SeatNo}, \texttt{BaggageQty})
+    \begin{itemize}
+        \item \textbf{Candidate Key:} \{\texttt{TrainNo, PassengerID}\}
+        \item \textbf{FDs Preserved:} $\texttt{TrainNo, PassengerID} \to \texttt{SeatNo, BaggageQty}$
+    \end{itemize}
+\end{itemize}
 \end{solution}
-
 \part \textbf{5 points}
 \begin{solution}
 
@@ -227,7 +229,6 @@ Yes, all three relations are in BCNF. For every \(X \to Y\) in \(F\), either \(X
     \item \(R_2\)(PassengerID, PassengerEmail): keys = \{PassengerID\}, \{PassengerEmail\}. PassengerID \(\to\) PassengerEmail has superkey LHS, and PassengerEmail \(\to\) PassengerID has superkey LHS. 
     \item \(R_3\)(TrainNo, PassengerID, SeatNo, BaggageQty): key = \{TrainNo, PassengerID\}. Both (TrainNo, PassengerID) \(\to\) SeatNo and (TrainNo, PassengerID) \(\to\) BaggageQty have the full key as LHS. 
 \end{itemize}
-
 \end{solution}
   \end{parts}
 \end{questions}
