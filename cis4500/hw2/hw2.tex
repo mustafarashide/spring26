@@ -179,14 +179,13 @@ All other dependencies satisfy 3NF because either the left-hand side is a superk
 the right-hand side attribute is a member of some candidate key.
 \end{solution}
     \part \textbf{2 points}
-    \part \textbf{2 points}
 \begin{solution}
-Yes, the decomposition has a lossless join. $R_1 \cap R_2 = \{\text{TrainNo, PassengerID}\}$, which is a candidate key of $R$ and therefore a superkey of $R_2$. By the lossless-join condition, a decomposition is lossless if the common attributes form a superkey of at least one of the relations, so the join is lossless.
+  Yes, the decomposition has a lossless join. \begin{center}\(R_1 \cap R_2 =\) \{TrainNo, PassengerID\},\end{center} which is a candidate key of $R$ and therefore a superkey of $R_2$. By the lossless-join condition, a decomposition is lossless if the common attributes form a superkey of at least one of the relations, so the join is lossless.
 \end{solution}
-
+\pagebreak
 \part \textbf{2 points}
 \begin{solution}
-No, this decomposition does \textbf{not} have a lossless join. \(R_1 \cap R_2 = \{\text{PassengerID}\}\), which is neither a superkey of \(R_1\) nor of \(R_2\) (PassengerID alone does not determine DepartureDate or ConductorID, nor SeatNo or BaggageQty), so the lossless-join condition fails. 
+  No, this decomposition does not have a lossless join. \begin{center}\(R_1 \cap R_2 =\) \{PassengerID\},\end{center} which is neither a superkey of \(R_1\) nor of \(R_2\) (PassengerID alone does not determine DepartureDate or ConductorID, nor SeatNo or BaggageQty), so the lossless-join condition fails. 
 \end{solution}
 
 \part \textbf{12 points}
