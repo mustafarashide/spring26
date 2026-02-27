@@ -179,21 +179,59 @@ All other dependencies satisfy 3NF because either the left-hand side is a superk
 the right-hand side attribute is a member of some candidate key.
 \end{solution}
     \part \textbf{2 points}
-    \begin{solution}
-      \textcolor{red}{FINISH ME!}
-    \end{solution}
     \part \textbf{2 points}
-    \begin{solution}
-      \textcolor{red}{FINISH ME!}
-    \end{solution}
-    \part \textbf{12 points}
-    \begin{solution}
-      \textcolor{red}{FINISH ME!}
-    \end{solution}
-    \part \textbf{5 points}
-    \begin{solution}
-      \textcolor{red}{FINISH ME!}
-    \end{solution}
+\begin{solution}
+Yes, the decomposition has a lossless join. $R_1 \cap R_2 = \{\text{TrainNo, PassengerID}\}$, which is a candidate key of $R$ and therefore a superkey of $R_2$. By the lossless-join condition, a decomposition is lossless if the common attributes form a superkey of at least one of the relations, so the join is lossless.
+\end{solution}
+
+\part \textbf{2 points}
+\begin{solution}
+No, this decomposition does \textbf{not} have a lossless join. $R_1 \cap R_2 = \{\text{PassengerID}\}$, which is neither a superkey of $R_1$ nor of $R_2$ (PassengerID alone does not determine DepartureDate or ConductorID, nor SeatNo or BaggageQty), so the lossless-join condition fails.
+\end{solution}
+
+\part \textbf{12 points}
+\begin{solution}
+We first compute a minimal cover $F_c$ by splitting all RHS, removing redundant attributes from LHS, and removing redundant FDs:
+\[
+F_c = \{\;
+\text{TrainNo} \to \text{DepartureDate},\;
+\text{TrainNo} \to \text{ConductorID},\;
+\text{PassengerID} \to \text{PassengerEmail},\;
+\text{PassengerEmail} \to \text{PassengerID},\;
+\]
+\[
+\text{TrainNo, PassengerID} \to \text{SeatNo},\;
+\text{TrainNo, PassengerID} \to \text{BaggageQty}
+\;\}
+\]
+Grouping by LHS and creating one relation per group gives:
+
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Relation} & \textbf{Attributes} & \textbf{Preserved FDs} & \textbf{Candidate Key(s)} \\
+\hline
+$R_1$ & (TrainNo, DepartureDate, ConductorID) & TrainNo $\to$ DepartureDate, ConductorID & \{TrainNo\} \\
+\hline
+$R_2$ & (PassengerID, PassengerEmail) & PassengerID $\leftrightarrow$ PassengerEmail & \{PassengerID\}, \{PassengerEmail\} \\
+\hline
+$R_3$ & (TrainNo, PassengerID, SeatNo, BaggageQty) & TrainNo, PassengerID $\to$ SeatNo, BaggageQty & \{TrainNo, PassengerID\} \\
+\hline
+\end{tabular}
+\end{center}
+
+Since $R_3$ already contains the candidate key \{TrainNo, PassengerID\} of $R$, no additional relation is needed.
+\end{solution}
+
+\part \textbf{5 points}
+\begin{solution}
+All three relations are in BCNF.
+\begin{itemize}
+    \item $R_1$: The only non-trivial FD is TrainNo $\to$ DepartureDate, ConductorID, and TrainNo is the sole candidate key, so it is a superkey. BCNF holds. \checkmark
+    \item $R_2$: Every non-trivial FD (PassengerID $\to$ PassengerEmail and PassengerEmail $\to$ PassengerID) has a candidate key on the LHS. BCNF holds. \checkmark
+    \item $R_3$: The only non-trivial FD is \{TrainNo, PassengerID\} $\to$ SeatNo, BaggageQty, and \{TrainNo, PassengerID\} is the candidate key. BCNF holds. \checkmark
+\end{itemize}
+\end{solution}
   \end{parts}
 \end{questions}
 \end{document}
