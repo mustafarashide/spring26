@@ -1,0 +1,224 @@
+\documentclass[12pt,letterpaper, onecolumn]{exam}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage[dvipsnames]{xcolor}
+\graphicspath{ {./images/} }
+\lhead{Mustafa Rashid\\}
+\rhead{Homework 3: Relational DB Design\\}
+\chead{\hline} 
+\thispagestyle{empty} 
+\newcommand*{\setdef}[1]{\left\{#1 \right\}} 
+\renewcommand{\thepartno}{\Alph{partno}} % Force uppercase letters
+\renewcommand{\partlabel}{\thepartno.}    % Format as A. B. C.
+
+\begin{document}
+\begingroup  
+\noindent\LARGE CIS 5500: Database and Information Systems\\
+\noindent\LARGE Homework 3: Transactions\\
+\noindent\large \today\\
+\noindent\large Mustafa Rashid\par
+\noindent\large Spring 2026\par
+\endgroup
+\rule{\textwidth}{0.4pt}
+\pointsdroppedatright
+\printanswers
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}
+
+% SQL listing from https://gist.githubusercontent.com/vivngo/e37e1c7b79bf7e8b910c6566c59c46be/raw/db8723fc80c8b1b01665851106dba2f370b5d865/code.tex
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{language=SQL,
+  basicstyle={\small\ttfamily},
+  belowskip=3mm,
+  breakatwhitespace=true,
+  breaklines=true,
+  classoffset=0,
+  columns=flexible,
+  commentstyle=\color{dkgreen},
+  framexleftmargin=0.25em,
+  frameshape={}{}{}{}, %To remove to vertical lines on left, set `frameshape={}{}{}{}`
+  keywordstyle=\color{blue},
+  numbers=none, %If you want line numbers, set `numbers=left`
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  stringstyle=\color{mauve},
+  tabsize=3,
+  xleftmargin =1em
+}
+
+\begin{questions}
+  \question \textbf{Question 1 (10 points)}
+  \begin{solution}
+    This is what is returned at timesteps 3-6. Timesteps 1 and 2 do not return anything.
+    \begin{center}
+\captionof{table}{Timestep 3}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{ID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+\hline
+210 & Madison & 19104 & 180 \\
+\hline
+\end{tabular}
+
+\captionof{table}{Timestep 4}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{ID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+\hline
+410 & Luca & 19114 & 180 \\
+\hline
+\end{tabular}
+
+\captionof{table}{Timestep 5}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{ID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+\hline
+210 & Madison & 19104 & 180 \\
+310 & Noor & 19104 & 200 \\
+\hline
+\end{tabular}
+
+\captionof{table}{Timestep 6}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{ID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+\hline
+210 & Madison & 19104 & 180 \\
+410 & Luca & 19114 & 180 \\
+310 & Noor & 19104 & 200 \\
+\hline
+\end{tabular}
+
+\captionof{table}{Final State}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{ID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+\hline
+220 & Ethan & 19106 & 160\\
+210 & Madison & 19104 & 180 \\
+410 & Luca & 19114 & 180 \\
+310 & Noor & 19104 & 200 \\
+\hline
+\end{tabular}
+\end{center}
+  \end{solution}
+  \pagebreak
+  \question \textbf{Question 2 (5 points)}
+  \begin{solution}
+     Postgres uses MVCC. Under \texttt{READ COMMITTED}, each statement gets a fresh snapshot of all committed data. This prevents dirty reads but allows phantom reads, since two statements in the same transaction can observe different committed states.
+    At times 1 and 2 no rows qualify because the initial balances are below 180. At time 3, T1 sees its own uncommitted \texttt{UPDATE} to Madison. At time 4, T2 sees only its own uncommitted insert of Luca---T1's update is not yet committed, so it is invisible (no dirty read). At time 5, T1 sees both its own \texttt{UPDATE} and \texttt{INSERT}; T2's Luca is still uncommitted. At time 6, T1 has committed; T2's new statement snapshots the database and now sees T1's rows alongside its own Luca---a phantom read.
+  \end{solution}
+  \question \textbf{Question 3 (10 points)}
+  \begin{solution}
+    \begin{parts}
+\part
+      \textbf{What happens at time 5.}
+      T1 attempts \texttt{INSERT INTO Accounts VALUES (410, 'Noor', 19104, 200)}. However, T2 already holds a write lock on \texttt{sid = 410} from its uncommitted insert of Luca (time 4). T1 therefore \emph{blocks} and waits for T2 to release its locks.
+
+      \medskip
+      \textbf{What happens at time 6 (T2 commits) and final state.}
+      T2 executes its \texttt{SELECT} and then \texttt{COMMIT}s, releasing all of its locks. T1 resumes and attempts to complete the insert of \texttt{sid = 410}. Because T2 committed that row (Luca), a \emph{primary key conflict} arises. Postgres aborts T1's entire transaction with a unique constraint violation, rolling back both the \texttt{UPDATE} to Madison and the blocked insert of Noor. T2's \texttt{SELECT} at time 6 returns:
+
+      \begin{center}
+      \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{SID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+      \hline
+      410 & Luca & 19114 & 180 \\
+      \hline
+      \end{tabular}
+      \end{center}
+
+      The final state of Accounts is:
+
+      \begin{center}
+      \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{SID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+      \hline
+      220 & Ethan   & 19106 & 160 \\
+      210 & Madison & 19104 & 90  \\
+      410 & Luca    & 19114 & 180 \\
+      \hline
+      \end{tabular}
+      \end{center}
+
+      T2's committed data (Luca at \texttt{sid = 410}) persists. T1 was aborted, so Madison's balance reverts to 90 and Noor is never inserted.
+
+      %% Part B
+      \part
+      \textbf{What happens at time 6 (T2 aborts) and final state.}
+      T2's \texttt{ROLLBACK} undoes the insert of Luca (\texttt{sid = 410}) and releases all of T2's locks. T1, which was blocked waiting for that lock, can now proceed. T1's insert of \texttt{(410, 'Noor', 19104, 200)} succeeds because no row with \texttt{sid = 410} exists any longer. T1's \texttt{SELECT} returns:
+
+      \begin{center}
+      \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{SID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+      \hline
+      210 & Madison & 19104 & 180 \\
+      410 & Noor    & 19104 & 200 \\
+      \hline
+      \end{tabular}
+      \end{center}
+
+      T1 then commits. The final state of Accounts is:
+
+      \begin{center}
+      \begin{tabular}{|c|c|c|c|}
+      \hline
+      \textbf{SID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+      \hline
+      220 & Ethan   & 19106 & 160 \\
+      210 & Madison & 19104 & 180 \\
+      410 & Noor    & 19104 & 200 \\
+      \hline
+      \end{tabular}
+      \end{center}
+
+      T2 rolled back, so Luca is never persisted. T1 successfully committed its \texttt{UPDATE} (Madison $\to$ 180) and its \texttt{INSERT} (Noor at \texttt{sid = 410}). Ethan is unchanged.
+    \end{parts}
+  \end{solution}
+  \question \textbf{Question 4 (5 points)}
+  \begin{solution}
+    Under \texttt{REPEATABLE READ}, T2's snapshot is taken once at the start of its first statement (time 2). At that moment, no account satisfies \texttt{balance $\geq$ 180}. T1's \texttt{UPDATE} and \texttt{INSERT}s are committed at time 5---after T2's snapshot---so they remain invisible to T2's entire transaction. The only qualifying row T2 can see is the one it inserted itself: Luca. T2's \texttt{SELECT} at time 6 therefore returns:
+
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    \textbf{SID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+    \hline
+    410 & Luca & 19114 & 180 \\
+    \hline
+    \end{tabular}
+    \end{center}
+
+    The final state of Accounts after both transactions commit is:
+
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    \textbf{SID} & \textbf{Name} & \textbf{Zip} & \textbf{Balance} \\
+    \hline
+    220 & Ethan   & 19106 & 160 \\
+    210 & Madison & 19104 & 180 \\
+    410 & Luca    & 19114 & 180 \\
+    310 & Noor    & 19104 & 200 \\
+    \hline
+    \end{tabular}
+    \end{center}
+  \end{solution}
+  \pagebreak
+  \question \textbf{Question 5 (5 points)}
+  \begin{solution}
+    Under \texttt{REPEATABLE READ}, Postgres takes a single MVCC snapshot at the transaction's first statement and reuses it for every subsequent statement. This prevents dirty reads, non-repeatable reads, and phantom reads.
+    T2's snapshot was taken at time 2, when no account had balance $\geq$ 180. T1's writes were committed at time 5---after T2's snapshot---so they remain invisible to T2. Unlike \texttt{READ COMMITTED}, where T2's time-6 statement got a fresh snapshot and saw T1's commits, under \texttt{REPEATABLE READ} T2 only ever sees its own insert of Luca.
+  \end{solution}
+  \question \textbf{Question 6 (5 points)}
+  \question \textbf{Question 7 (10 points)}
+\end{questions}
+\end{document}

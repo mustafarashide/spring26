@@ -1,0 +1,70 @@
+after 1 and 2
+no change
+
+after 3
+210,Madison,19104,180
+
+after 4
+410,Luca,19114,180
+
+after 5
+210,Madison,19104,180
+310,Noor,19104,200
+
+after 6
+210,Madison,19104,180
+410,Luca,19114,180
+310,Noor,19104,200
+
+final state of accounts
+220,Ethan,19106,160
+210,Madison,19104,180
+410,Luca,19114,180
+310,Noor,19104,200
+
+q3 A
+time 6
+410,Luca,19114,180
+
+final state
+220,Ethan,19106,160
+210,Madison,19104,90
+410,Luca,19114,180
+
+q3 B
+time 6
+210,Madison,19104,180
+410,Noor,19104,200
+
+final state
+220,Ethan,19106,160
+210,Madison,19104,180
+410,Noor,19104,200
+
+q4
+time 6
+410,Luca,19114,180
+
+final state
+220,Ethan,19106,160
+210,Madison,19104,180
+410,Luca,19114,180
+310,Noor,19104,200
+
+q6
+time 6
+210,Madison,19104,180
+410,Luca,19114,180
+310,Noor,19104,200
+
+final state
+220,Ethan,19106,160
+210,Madison,19104,180
+410,Luca,19114,180
+310,Noor,19104,200
+
+q7
+at t6 we get this error:
+[40001] ERROR: could not serialize access due to read/write dependencies among transactions
+  Detail: Reason code: Canceled on identification as a pivot, during conflict out checking.
+  Hint: The transaction might succeed if retried.
