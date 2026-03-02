@@ -226,20 +226,22 @@
   \end{solution}
   \question \textbf{Question 7 (10 points)}
   \begin{solution}
+   At time 6, Postgres aborts T2 with \texttt{ERROR: could not serialize access due to read/write dependencies among transactions}.
+
     \begin{parts}
-  \part
+      \part
       In Q6, T1 ran in \texttt{READ COMMITTED}, so it was excluded from SSI's READ/WRITE dependency tracking. No serialization anomaly could be detected, and T2 committed successfully. The valid serial order was T1 before T2.
 
-      In Q7, both transactions run in \texttt{SERIALIZABLE}, so READ/WRITE dependencies between them are tracked. A serialization anomaly is detected (a cycle of rw-dependencies), leading to T2's failure.
+      In Q7, both transactions run in \texttt{SERIALIZABLE}, so READ/WRITE dependencies between them are tracked. The dependencies between T1 and T2 create a serialization anomaly with no valid serial order, leading to T2's failure.
 
       \part
-      Under \texttt{SERIALIZABLE}, READ/WRITE dependencies between transactions are tracked and a serialization anomaly leads to transaction failure. Two rw-dependencies form a cycle:
+      Under \texttt{SERIALIZABLE}, READ/WRITE dependencies between transactions are tracked and a serialization anomaly leads to transaction failure. Two rw-dependencies form a contradiction:
 
-      \textbf{T2 $\xrightarrow{\text{rw}}$ T1:} T2 read \texttt{balance $\geq$ 180} at time 2 (empty). T1 later wrote rows satisfying that predicate (Madison $\to$ 180 at time 3, Noor at time 5).
+      \textbf{T2 $\xrightarrow{\text{rw}}$ T1:} T2 read \texttt{balance $\geq$ 180} at time 2 (empty). T1 later wrote rows satisfying that predicate (Madison $\to$ 180 at time 3, Noor at time 5). This requires T2 to be ordered before T1.
 
-      \textbf{T1 $\xrightarrow{\text{rw}}$ T2:} T1 read \texttt{balance $\geq$ 180} at time 1 (empty). T2 later wrote a row satisfying it (Luca at time 4).
+      \textbf{T1 $\xrightarrow{\text{rw}}$ T2:} T1 read \texttt{balance $\geq$ 180} at time 1 (empty). T2 later wrote a row satisfying it (Luca at time 4). This requires T1 to be ordered before T2.
 
-      The cycle $\text{T1} \xrightarrow{\text{rw}} \text{T2} \xrightarrow{\text{rw}} \text{T1}$ means no valid serial order exists, so SSI aborts T2.
+      T1 must come before T2 \emph{and} T2 must come before T1---a contradiction. No valid serial order exists, so SSI aborts T2.
     \end{parts}
     \end{solution}
 \end{questions}
