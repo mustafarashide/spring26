@@ -226,6 +226,7 @@
   \end{solution}
   \question \textbf{Question 7 (10 points)}
   \begin{solution}
+    \begin{parts}
   \part
       In Q6, T1 ran in \texttt{READ COMMITTED}, so it was excluded from SSI's READ/WRITE dependency tracking. No serialization anomaly could be detected, and T2 committed successfully. The valid serial order was T1 before T2.
 
