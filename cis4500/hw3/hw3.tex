@@ -219,6 +219,11 @@
     T2's snapshot was taken at time 2, when no account had balance $\geq$ 180. T1's writes were committed at time 5---after T2's snapshot---so they remain invisible to T2. Unlike \texttt{READ COMMITTED}, where T2's time-6 statement got a fresh snapshot and saw T1's commits, under \texttt{REPEATABLE READ} T2 only ever sees its own insert of Luca.
   \end{solution}
   \question \textbf{Question 6 (5 points)}
+  \begin{solution}
+    T2's \texttt{SELECT} at time 6 returns Madison, Luca, and Noor---identical to the \texttt{READ COMMITTED} result in Q1, and different from the \texttt{REPEATABLE READ} result in Q4 (which returned only Luca).
+
+    Under \texttt{SERIALIZABLE}, READ/WRITE dependencies between transactions are tracked and a serialization anomaly leads to transaction failure (SSI). However, SSI only tracks dependencies between transactions \emph{both} running in \texttt{SERIALIZABLE}. Since T1 runs in \texttt{READ COMMITTED}, it is excluded from dependency tracking, so no serialization anomaly can be detected and T2 commits successfully. Because each query in T2 sees the committed version of the database as of the beginning of the transaction, and T1's writes were committed before T2's time-6 statement, T2 sees T1's rows. The effective serial order is T1 before T2.
+  \end{solution}
   \question \textbf{Question 7 (10 points)}
 \end{questions}
 \end{document}
