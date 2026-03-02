@@ -241,7 +241,7 @@
 
       \textbf{T1 $\xrightarrow{\text{rw}}$ T2:} T1 read \texttt{balance $\geq$ 180} at time 1 (empty). T2 later wrote a row satisfying it (Luca at time 4). This requires T1 to be ordered before T2.
 
-      T1 must come before T2 \emph{and} T2 must come before T1---a contradiction. No valid serial order exists, so SSI aborts T2.
+      T1 must come before T2 \emph{and} T2 must come before T1 which is a contradiction. No valid serial order exists, so SSI aborts T2.
     \end{parts}
     \end{solution}
 \end{questions}
