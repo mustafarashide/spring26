@@ -39,6 +39,11 @@
 		\end{itemize}
     \section*{Module 2: Advanced SQL}
 		\begin{itemize}[leftmargin=*]
+      \item why sql over excel? (1. performed over larger than memory datasets, 2. data can be combined between tables, 3. optimized to run fast)
+      \item set vs bag: a set does not contain duplicates while a bag may contain duplicates
+      \item \texttt{SELECT..FROM..WHERE} use bag semantics while \texttt{UNION,INTERSECT,MINUS} use set semantics unless \texttt{ALL} is used
+      \item union compatible: two relations have the same number attributes with the same domains
+      \item subquery: occurs in \texttt{WHERE} clause, can be correlated (uses variables in outer query) or uncorrelated (independent of outer query)
 		\end{itemize}
 
     \section*{Module 3: Designing a Database}
