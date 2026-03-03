@@ -30,7 +30,12 @@
       \item cardinality: number of rows in current instance
       \item instance of a table (non-header rows) changes quickly over time as the real-world changes
       \item DDL: data definition language, specifies database schema, attributes and their domains, keys (primary or unique), and foreign keys
-      \item DML: data manipulation language based on relational algebra and calculus
+      \item DML: data manipulation language based on relational algebra and calculus (insert statements are DML)
+      \item order in which tuples are inserted into tables matters due to referential integrity (foreign key constraints)
+      \item useless query: return the empty result for every instance
+      \item common table expressions: creates a temporary table for duration of the query
+      \item table expressions: embedded in a query where a table is expected
+      \item temporary tables: require permissions, exist for duration of session
 		\end{itemize}
     \section*{Module 2: Advanced SQL}
 		\begin{itemize}[leftmargin=*]
