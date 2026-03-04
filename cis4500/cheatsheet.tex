@@ -24,8 +24,8 @@
 		\section*{Module 1: Introduction to DBMS}
 		\begin{itemize}[leftmargin=*]
       \item database: collection of data items stored systematically \& permanently in a computer so that programs can consult it to answer questions to get information that can be used to make decisions
-      \item benefits of a DBMS: generality \& declarativity, efficiency \& scale, concurrency, consistecy \& reliability
-      \item relational data model: model data indepently of how it will be used, describes data minimally and mathematically
+      \item benefits of a DBMS: generality \& declarativity, efficiency \& scale, concurrency, consistency \& reliability
+      \item relational data model: model data independently of how it will be used, describes data minimally and mathematically
       \item relation: a set of tuples with attributes
       \item schema: sets the structure of the table
       \item arity/degree: number of columns
@@ -61,7 +61,7 @@
           \item \texttt{OUTER JOIN}: includes all tuples in the left, right, or both tables even if they do not participate in a join.
           \item cardinality of join result: 0 to product of the sizes of the two tables, if there is a key-foreign relationship, the result is bounded by the size of the table with the foreign key.
           \item view: a named query that can be used in other queries, is computed upon request and is always up-to-date, persists until it is dropped
-          \item materialized view: computed once and its results are stored as a table, must be updated as the underlying database changes, important for query optmization
+          \item materialized view: computed once and its results are stored as a table, must be updated as the underlying database changes, important for query optimization
           \item view is updatable if:
             \begin{itemize}
               \item it is defined on a single base table
@@ -123,10 +123,77 @@
       \item \(X\) contains a key for \(R\) (\(X\) is a superkey)
       \end{itemize}
     \item lossless decomposition: \(R_1,\dots,R_{k}\) is a lossless join decomposition of \(R\) wrt an \(FD\) set \(F\) if for every instance \(r\) of \(R\) that satisfies \(F\), projecting \(r\) over each \(R_{i}\) and then joining the resulting instances together gives back the original instance \(r\).
-    \item a decomposition is good if it is lossless and it preserves deendencies (\(F=F_1\cup\dots\ F_k\))
+    \item a decomposition is good if it is lossless and it preserves dependencies (\(F=F_1\cup\dots\cup F_k\))
+    \item testing for a lossless join: 
+      \begin{align*}
+        (R_1 \cap R_2)\rightarrow(R_1-R_2)\text{ or}\\
+        (R_1 \cap R_2)\rightarrow(R_2-R_1)
+      \end{align*}
+    \item F is a minimal cover if (intuitively)
+      \begin{itemize}
+        \item no functional dependency can be removed from \(F\), and
+        \item no functional dependency can have its left-hand side simplified by removing an attribute
+        \item and still have an equivalent set of dependencies
+\end{itemize}
+\item 3NF Decomposition algorithm
+\begin{center}
+\begin{minipage}{\linewidth}
+\begin{algorithmic}[1]
+\State Let $F$ be a minimal cover, $R$ be a non-3NF schema
+\State $i := 0$
+\For{each FD $X \to Y$ in $F$}
+    \If{none of the schemas $R_j$, $1 \leq j \leq i$, contains $XY$}
+        \State $i := i + 1$
+        \State $R_i := (X, Y)$
+    \EndIf
+\EndFor
+\If{no schema $R_j$, $1 \leq j \leq i$, contains a candidate key for $R$}
+    \State $i := i + 1$
+    \State $R_i :=$ any candidate key for $R$
+\EndIf
+\end{algorithmic}
+\end{minipage}
+\end{center}
 \end{itemize}
     \section*{Module 5: Updates \& Transactions}
 		\begin{itemize}[leftmargin=*]
+      \item ACID properties of transactions (guaranteed by DBMS):
+        \begin{enumerate}
+          \item Atomicity: either all of the actions (read/write) of a transaction are executed or none are
+          \item Consistency: each transaction executed in isolation keeps the database in a consistent state
+          \item Isolation: trnasactions are isolated from the effects of other, currently executing, transactions
+          \item Durability: updates persist in the DBMS 
+          \end{enumerate}
+        \item SQL DML contains \texttt{INSERT, UPDATE, DELETE}
+        \item An execution is good it it is serial or equivalent to some serial execution
+        \item Undesirable phenomena
+          \begin{itemize}
+            \item dirty read: a transaction reads data that is written by another \textit{uncommitted} transaction
+            \item unrepeatable read: a transaction reads the same data item twice and gets different values
+            \item phantom read: a transaction retrieves a set of tuples twice but sees different results, even though it does not modify any of these tuples
+            \end{itemize}
+          \item SQL isolation levels (strongest to weakest, more expensive to least expensive):
+            \begin{itemize}
+              \item SERIALIZABLE: complete isolation
+              \item REPEATABLE READ: allows phantom reads
+              \item READ COMMITTED: allows unrepeatable reads, phantom reads
+              \item READ UNCOMMITTED: allows dirty reads, unrepeatable reads, phantom reads (transactions must be read only)
 		\end{itemize}
+  \item modern systems uses Multi Version Concurrency Control which means that the database maintains multiple versions of the database state
+  \item MVCC systems do not implement read uncommitted since avoiding dirty reads comes for free
+  \item isolation levels in postgres:
+    \begin{enumerate}
+      \item read committed (default): Each query in a transaction sees the committed version of the database as of the beginning of the transaction. Changes made by other transactions are visible as soon as they commit.
+      \item repeatable read: each query in a transaction sees the committed version of the database as of the beginning of the transaction (so no phantom reads)
+      \item serializable: each query in a transaction sees the committed version of the database as of the beginning of the transaction. Read/Write dependencies between transactions are tracked, and if a serialization anomaly was possible
+        it aborts one of the transactions (Serializable Snapshot Isolation)
+      \item read uncommitted: \textbf{NOT} implemented as dirty reads can \textit{never} occur
+      \end{enumerate}
+    \item additional undesirable phenomena (not avoided by MVCC and so postgres checks for conflicts when transactions COMMIT)
+      \begin{itemize}
+        \item Lost Updates: One transaction overwrites the value of data that was written by another transaction
+        \item Serialization Anomalies: The execution of a group of transactions is not equivalent to some serial execution of those transactions
+  \end{itemize}
+\end{itemize}
 	\end{multicols*}
 \end{document}
