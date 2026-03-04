@@ -194,6 +194,20 @@
         \item Lost Updates: One transaction overwrites the value of data that was written by another transaction
         \item Serialization Anomalies: The execution of a group of transactions is not equivalent to some serial execution of those transactions
   \end{itemize}
+\item Postgres isolation levels
+  \begin{itemize}[leftmargin=*]
+    \item \textbf{SERIALIZABLE}: no dirty reads, unrepeatable reads, phantoms, lost updates, or serialization anomalies
+    \item \textbf{REPEATABLE READ}: no dirty reads, unrepeatable reads, phantoms, or lost updates; allows serialization anomalies
+    \item \textbf{READ COMMITTED}: no dirty reads; allows unrepeatable reads, phantoms, lost updates, serialization anomalies
+\end{itemize}
+    \item Postgres essentially implements two isolation levels: READ COMMITTED and SERIALIZABLE
+    \begin{itemize}
+        \item when READ UNCOMMITTED is specified, the transaction is executed as READ COMMITTED
+        \item REPEATABLE READ guarantees no phantom reads, making it essentially equivalent to SERIALIZABLE
+    \end{itemize}
+    \item SERIALIZABLE in Postgres is stronger than the standard as it also avoids serialization anomalies
+    \item both REPEATABLE READ and SERIALIZABLE guarantee no lost updates
+    \item avoiding lost updates and serialization anomalies is accomplished using MVCC, with conflict checking when the transaction requests COMMIT
 \end{itemize}
 	\end{multicols*}
 \end{document}
