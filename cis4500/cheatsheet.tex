@@ -8,6 +8,8 @@
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{mdframed}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{tikz}
 \usepackage{mathrsfs}
 \usepackage{titlesec}
@@ -74,8 +76,55 @@
 			\end{itemize}
       \section*{Module 4: Relational Design Theory}
 		\begin{itemize}[leftmargin=*]
+      \item functional dependencies (\(X\rightarrow Y\)): \(X\) and \(Y\) are sets of attributes and are semantic assertions
+      \item key: a minimal set of attributes where if the value of all key fields of two tuples are the same, then the tuples are the same
+      \item functional dependencies can be enforced by specifying them as a constraint
+      \item armstrong's axioms
+        \begin{itemize}
+          \item reflexivity: if \(Y\subseteq X\) then \(X\rightarrow Y\) (trivial dependencies)
+          \item augmentation: if \(X\rightarrow Y\) then \(XW\rightarrow YW\)
+          \item transitivity: if \(X\rightarrow Y\) and \(Y\rightarrow Z\) then \(X\rightarrow Z\)
 		\end{itemize}
-		 
+  \item consequences of armstrong's axioms:
+    \begin{itemize}
+      \item union: if \(X\rightarrow Y\) and \(X\rightarrow Z\) then \(X\rightarrow YZ\)
+      \item decomposition: if \(X\rightarrow Y\) and \(Z\subseteq Y\) then \(X\rightarrow Z\)
+      \item pseudotransitivity: if \(X\rightarrow Y\) and \(WY\rightarrow Z\) then \(XW\rightarrow Z\)
+		\end{itemize}
+  \item finding candidate keys: finding subsets \(K\) of \(R\), verifying that \(K\) is a key
+    \begin{itemize}
+      \item any attribute that is never on the rhs of an fd must be in any primary key
+      \item once you have found a candidate key \(K\) you never have to look at supersets of \(K\)
+		\end{itemize}
+  \item given \(X\) and \(F\) we test if \(X\) is a candidate key for \(R\) by asking if \(X^{+}=R\) and checking that \(X\) is minimal
+    \begin{center}
+\begin{minipage}{\linewidth}
+\begin{algorithmic}[1]
+\State $\text{closure} \gets X$
+\State Mark all FDs $U \to V$ in $F$ as \textit{unused}
+\Repeat
+    \If{there is an unused FD $U \to V$ in $F$ such that $U \subseteq \text{closure}$}
+        \State Add $V$ to $\text{closure}$ and mark $U \to V$ as \textit{used}
+    \EndIf
+\Until{no change to $\text{closure}$}
+\end{algorithmic}
+\end{minipage}
+\end{center}
+\item 1NF: a relation is in 1NF if all its attributes are atomic (no lists or records)
+\item 3NF: A relation is in 3NF if it is in 1NF and for every \(X\rightarrow A\) in F either:
+  \begin{itemize}
+    \item \(A\in X\) (it is trivial) or
+    \item \(X\) is a super key for \(R\) or
+    \item \(A\) is a member of some key for \(R\)
+    \end{itemize}
+  \item BCNF: A relation is in BCNF if for every \(X\rightarrow Y\) in \(F\) either:
+    \begin{itemize}
+      \item \(Y\) is a subset of \(X\) (i.e. \(X\rightarrow Y\) is trivial) or
+      \item \(X\) contains a key for \(R\) (\(X\) is a superkey)
+      \end{itemize}
+    \item lossless decomposition: \(R_1,\dots,R_{k}\) is a lossless join decomposition of \(R\) wrt an \(FD\) set \(F\) if for every instance \(r\) of \(R\) that satisfies \(F\), projecting \(r\) over each \(R_{i}\) and then joining the resulting instances together gives back the original instance \(r\).
+    \item a decomposition is good if it is lossless and it preserves deendencies (\(F=F_1\cup\dots\ F_k\))
+\end{itemize}
     \section*{Module 5: Updates \& Transactions}
 		\begin{itemize}[leftmargin=*]
 		\end{itemize}
