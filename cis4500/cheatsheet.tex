@@ -44,6 +44,29 @@
       \item \texttt{SELECT..FROM..WHERE} use bag semantics while \texttt{UNION,INTERSECT,MINUS} use set semantics unless \texttt{ALL} is used
       \item union compatible: two relations have the same number attributes with the same domains
       \item subquery: occurs in \texttt{WHERE} clause, can be correlated (uses variables in outer query) or uncorrelated (independent of outer query)
+      \item three state logic: T=1, F=0, U=0.5 where:
+        \begin{itemize}
+          \item AND: calculate \texttt{MIN(X,Y)}
+          \item OR: calculate \texttt{MAX(X,Y)}
+          \item NOT: calculate \texttt{1-X}
+        \end{itemize}
+          \item for comparison with x=NULL we get unknown, arithmetic expressions would get NULL
+          \item for aggregating we ignore NULL values except for \texttt{COUNT}
+          \item \texttt{SELECT DISTINCT} treats all NULLs as equal
+          \item \texttt{COUNT DISTINCT} does not count NULLs
+          \item \texttt{GROUP BY} treats NULLs as equal
+          \item Set operations treat NULLs as equal unless we use \texttt{ALL}
+          \item \texttt{OUTER JOIN}: includes all tuples in the left, right, or both tables even if they do not participate in a join.
+          \item cardinality of join result: 0 to product of the sizes of the two tables, if there is a key-foreign relationship, the result is bounded by the size of the table with the foreign key.
+          \item view: a named query that can be used in other queries, is computed upon request and is always up-to-date, persists until it is dropped
+          \item materialized view: computed once and its results are stored as a table, must be updated as the underlying database changes, important for query optmization
+          \item view is updatable if:
+            \begin{itemize}
+              \item it is defined on a single base table
+              \item it uses only selection and projection
+              \item there are no aggregates
+              \item \texttt{DISTINCT} is not used
+              \end{itemize}
 		\end{itemize}
 
     \section*{Module 3: Designing a Database}
