@@ -201,8 +201,6 @@ const query = `
  ...]
     \end{lstlisting}
     Mayur Naik's account number is \textbf{ACC-2001}.
-
-    A UNION injection cannot be performed through the \texttt{cols=} parameter on the Transactions page because \texttt{cols} is injected into the middle of the SELECT clause. The FROM, WHERE, ORDER BY, and LIMIT clauses follow immediately after, making it impossible to terminate the first SELECT statement and append a UNION SELECT.
   \end{parts}
 
   \question \textbf{Question 4 (2 points)}
@@ -224,7 +222,18 @@ DESC; UPDATE accounts SET balance=1000000 WHERE user_id=1--
 
   \pagebreak
   \question \textbf{Question 6 (2 points)}
-  
+  \begin{parts}
+    \part The Q5 transfer was transaction \textbf{id = 18}. The following payload was injected via the \texttt{order=} parameter:
+    \begin{lstlisting}[language=SQL]
+DESC; UPDATE transactions SET from_account=2, description='A hacked gift from Daniel Zhao. Thank me later' WHERE id=18--
+    \end{lstlisting}
+    The server falls back to \texttt{db.exec()}, which executes both statements. \texttt{from\_account} is now \texttt{2} and the description is updated accordingly.
+
+    \part Bobby's transaction list \textbf{does not show} the modified row. The query filters by \texttt{from\_account = acc.id OR to\_account = acc.id} using Bobby's account id (\texttt{1}). After the UPDATE, the row has \texttt{from\_account = 2} and \texttt{to\_account = 3}, so it no longer matches and disappears from Bobby's view.
+
+    This demonstrates that audit logs cannot be trusted in a system with SQL injection vulnerabilities. Any transaction record can be rewritten after the fact, silently redirecting attribution to a different account.
+  \end{parts}
+
   \question \textbf{Question 7 (2 points)}
   \begin{parts}
     \part The corrected JavaScript for both vulnerable endpoints:
