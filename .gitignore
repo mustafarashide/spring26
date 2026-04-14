@@ -6,3 +6,10 @@ cs355/
 *.fls
 *.fdb_latexmk
 *.aux
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/Release
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/deps
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/Makefile
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/better_sqlite3.target.mk
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/binding.Makefile
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/config.gypi
+/cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/test_extension.target.mk
