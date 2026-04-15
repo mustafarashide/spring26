@@ -55,13 +55,15 @@
   \begin{parts}
     \part (5 points)
     \begin{solution}
-      \[\pi_{\text{SName}}(\sigma_{\text{S.SId=E.SId}\land\text{S.Age<21}\land\text{E.CId=C.CId}\land\text{C.Instructor=``Dr.Naik"}}(S\times C\times E))\]
+      \[\pi_{\text{SName}}(\sigma_{\text{S.SId=E.SId}\land\text{S.Age<21}\land\text{E.CId=C.CId}\land\text{C.Instructor=``Dr.Naik"}}(S\times E\times C))\]
+    \end{solution}
+    \part \textbf{5 points}
+    \begin{solution}
+      \[\pi_{\text{SName}}(\sigma_{\text{S.Age<21}\land\text{C.Instructor=``Dr.Naik"}}((S\bowtie E)\bowtie C))\]
     \end{solution}
     \part (5 points)
     \begin{solution}
-    \end{solution}
-    \part (5 points)
-    \begin{solution}
+      \[\pi_{\text{SName}}((\sigma_{\text{S.Age<21}}S\bowtie E)\bowtie \sigma_{\text{C.Instructor=``Dr.Naik"}}C))\]
     \end{solution}
   \end{parts}
   \question \textbf{Question 2: Cost estimation (40 points)}
