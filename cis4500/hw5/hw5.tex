@@ -63,7 +63,7 @@
     \end{solution}
     \part (5 points)
     \begin{solution}
-      \[\pi_{\text{SName}}((\sigma_{\text{S.Age<21}}S\bowtie E)\bowtie \sigma_{\text{C.Instructor=``Dr.Naik"}}C))\]
+      \[\pi_{\text{SName}}(\pi_{\text{SId,SName}}(\sigma_{\text{S.Age<21}}S\bowtie \pi_{\text{SId,CId}}E)\bowtie \pi_{\text{CId}}\sigma_{\text{C.Instructor=``Dr.Naik"}}C))\]
     \end{solution}
   \end{parts}
   \question \textbf{Question 2: Cost estimation (40 points)}
