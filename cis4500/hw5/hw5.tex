@@ -62,8 +62,11 @@
       \[\pi_{\text{SName}}(\sigma_{\text{S.Age<21}\land\text{C.Instructor=``Dr.Naik"}}((S\bowtie E)\bowtie C))\]
     \end{solution}
     \part (5 points)
-    \begin{solution}
-      \[\pi_{\text{SName}}(\pi_{\text{SId,SName}}(\sigma_{\text{S.Age<21}}S\bowtie \pi_{\text{SId,CId}}E)\bowtie \pi_{\text{CId}}\sigma_{\text{C.Instructor=``Dr.Naik"}}C))\]
+    \begin{solution}\\
+      \begin{align*}
+\pi_{\text{SName}}(&\pi_{\text{SName, CId}}(\pi_{\text{SId, SName}}(\sigma_{\text{Age<21}}S) \bowtie \pi_{\text{SId, CId}}E) \\
+&\bowtie \pi_{\text{CId}}(\sigma_{\text{Instructor=``Dr.Naik"}}C))
+\end{align*}
     \end{solution}
   \end{parts}
   \question \textbf{Question 2: Cost estimation (40 points)}
