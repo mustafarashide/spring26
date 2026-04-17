@@ -70,6 +70,27 @@
     \end{solution}
   \end{parts}
   \question \textbf{Question 2: Cost estimation (40 points)}
+  \begin{parts}
+    \part (5 points)
+    \begin{solution}
+      The Researcher relation has 8000 tuples. Out of those \(\frac{1}{50}\) are in the field of biology and \(\frac{}{}\) have been active for 12 or more years. So we 
+      can estimate that \(\frac{1}{50}\dot\frac{40-12}{40}\dot8000=112\) tuples to be the result of the subquery.
+    \end{solution}
+    \part (10 points)
+    \begin{solution}
+      \begin{enumerate}
+        \item The subquery \(\sigma_{\text{region=1}\lor\text{region=3}\text{Conference}}\) will have \(\frac{1}{4}\dot2000+\frac{1}{4}]dot2000=1000)\) tuples. Because each researcher is in one conference, we will have 112 tuples which we project onto two attributes. This means that we will need \(\lceil\frac{224}{400}\rceil\) or one page.
+      \item The subquery \(\sigma_{\text{region=4}}\text{Conference}\) will have \(\frac{1}{4}\dot2000=500\) tuples. We then join on \texttt{cid} which will give us 500 tuples as each conference has corresponding stats. Projecting this onto 3 attributes will give us 1500 attributes meaning that we will need \(\lceil\frac{1500}{400}\rceil\) or 4 pages.
+        \end{enumerate}
+        \part (10 points)
+        \begin{solution}
+          \begin{enumerate}
+            \item Because \(\lvert\text{ConfStats}\rvert=\lvert\text{Conference}\rvert\) it does not matter which relation we use as outer. The cost will be \(20+\rceil\frac{20}{18}\rceil\dot20=60\) I/Os
+            \item Because \
+          \end{enumerate}
+        \end{solution}
+    \end{solution}
+  \end{parts}
   \question \textbf{Question 3:Improving queries using EXPLAIN PLAN (45 points)}
 \end{questions}
 \end{document}
