@@ -2,13 +2,14 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{color}
+\usepackage{amsmath}
 \usepackage{caption}
 \usepackage{listings}
 \usepackage[dvipsnames]{xcolor}
 \graphicspath{ {./images/} }
 \lhead{Mustafa Rashid\\}
 \rhead{Homework 5: Query Implementation\\}
-\chead{\hline} 
+\chead{\rule{\textwidth}{0.4pt}}
 \thispagestyle{empty} 
 \newcommand*{\setdef}[1]{\left\{#1 \right\}} 
 \renewcommand{\thepartno}{\Alph{partno}} % Force uppercase letters
@@ -73,24 +74,164 @@
   \begin{parts}
     \part (5 points)
     \begin{solution}
-      The Researcher relation has 8000 tuples. Out of those \(\frac{1}{50}\) are in the field of biology and \(\frac{}{}\) have been active for 12 or more years. So we 
-      can estimate that \(\frac{1}{50}\dot\frac{40-12}{40}\dot8000=112\) tuples to be the result of the subquery.
+      The Researcher relation has 8000 tuples. Out of those \(\frac{1}{50}\) are in the field of biology and \(\frac{40-12}{40}\) have been active for 12 or more years. So we 
+      can estimate that \(\frac{1}{50}\cdot\frac{7}{10}\cdot8000=112\) tuples to be the result of the subquery.
     \end{solution}
+    \pagebreak
     \part (10 points)
     \begin{solution}
       \begin{enumerate}
-        \item The subquery \(\sigma_{\text{region=1}\lor\text{region=3}\text{Conference}}\) will have \(\frac{1}{4}\dot2000+\frac{1}{4}]dot2000=1000)\) tuples. Because each researcher is in one conference, we will have 112 tuples which we project onto two attributes. This means that we will need \(\lceil\frac{224}{400}\rceil\) or one page.
-      \item The subquery \(\sigma_{\text{region=4}}\text{Conference}\) will have \(\frac{1}{4}\dot2000=500\) tuples. We then join on \texttt{cid} which will give us 500 tuples as each conference has corresponding stats. Projecting this onto 3 attributes will give us 1500 attributes meaning that we will need \(\lceil\frac{1500}{400}\rceil\) or 4 pages.
+      \item The subquery \(\sigma_{\text{region=1}\lor\text{region=3}}\text{Conference}\) will have \(\frac{1}{4}\cdot2000+\frac{1}{4}\cdot2000=1000\) tuples. Each of the 112 filtered researchers has a \texttt{cid} that references one of the 2000 conferences uniformly. The probability that a researcher's conference is in region 1 or 3 is \(\frac{1000}{2000}=\frac{1}{2}\), so the join yields \(112\cdot\frac{1}{2}=56\) tuples. Projecting onto two attributes gives \(56\cdot2=112\) attributes, so we need \(\lceil\frac{112}{400}\rceil\) or one page.
+      \item The subquery \(\sigma_{\text{region=4}}\text{Conference}\) will have \(\frac{1}{4}\cdot2000=500\) tuples. We then join on \texttt{cid} which will give us 500 tuples as each conference has corresponding stats. Projecting this onto 3 attributes will give us 1500 attributes meaning that we will need \(\lceil\frac{1500}{400}\rceil\) or 4 pages.
         \end{enumerate}
+      \end{solution}
         \part (10 points)
         \begin{solution}
           \begin{enumerate}
-            \item Because \(\lvert\text{ConfStats}\rvert=\lvert\text{Conference}\rvert\) it does not matter which relation we use as outer. The cost will be \(20+\rceil\frac{20}{18}\rceil\dot20=60\) I/Os
-            \item Because \
+            \item Because \(\lvert\text{ConfStats}\rvert=\lvert\text{Conference}\rvert\) it does not matter which relation we use as outer. The cost will be \(20+\lceil\frac{20}{16}\rceil\cdot20=60\) I/Os.
+            \item Because \(\lvert\text{Conference}\rvert<\lvert\text{Researcher}\rvert\) we use Conference as the outer relation. The cost will be \(20+\lceil\frac{20}{16}\rceil\cdot80=180\) I/Os.
           \end{enumerate}
-        \end{solution}
+    \end{solution}
+    \part (5 points)
+    \begin{solution}
+      \begin{enumerate}
+        \item \textbf{BNLJ:} Use Conference as outer (20 pages $<$ 80 pages). Cost $= 20 + \lceil\frac{20}{16}\rceil\cdot 80 = 20+160=180$ I/Os.
+        \item \textbf{Sort-merge join:} Researcher is already sorted on \texttt{cid} (cost = 0). Sort Conference: $2(20)(1+\lceil\log_{17}\lceil\frac{20}{18}\rceil\rceil)=40(1+1)=80$ I/Os. Merge: $20+80=100$ I/Os. Total: $80+100=180$ I/Os.
+      \end{enumerate}
+      Both cost 180 I/Os; we prefer sort-merge since it is less sensitive to data skew and the result is sorted.
+    \end{solution}
+    \pagebreak
+    \part (10 points)
+    \begin{solution}
+      Total SMJ cost $= 2\cdot 2X\!\left(1+\left\lceil\log_{5}\!\left\lceil\frac{X}{6}\right\rceil\right\rceil\right)+2X \leq 14X$. Dividing by $X$ and simplifying:
+      \[\left\lceil\log_{5}\!\left\lceil\frac{X}{6}\right\rceil\right\rceil \leq 2 \implies \left\lceil\frac{X}{6}\right\rceil \leq 25 \implies X \leq 150.\]
+      The maximum value of $X$ is $\mathbf{150}$.
     \end{solution}
   \end{parts}
-  \question \textbf{Question 3:Improving queries using EXPLAIN PLAN (45 points)}
+  \question \textbf{Question 3: Improving queries using EXPLAIN PLAN (45 points)}
+  \begin{parts}
+    \part (15 points) Writing better queries
+    \begin{enumerate}
+      \item (6 points)
+      \begin{solution}
+        \begin{enumerate}
+          \item \textbf{Unnecessary table join:} \texttt{LEFT JOIN movie\_genres mg} is never referenced in \texttt{SELECT} or \texttt{WHERE}. It produces duplicate rows for multi-genre movies, forcing a \texttt{GROUP BY} to deduplicate. Removing it eliminates the join entirely and the need for grouping.
+          \item \textbf{Redundant correlated subquery condition:} Inside the \texttt{actor\_count} subquery, \texttt{AND c.movie\_id IN (SELECT movie\_id FROM cast\_in)} is always true since \texttt{c} is already drawn from \texttt{cast\_in}. This forces an unnecessary full scan of \texttt{cast\_in} on every outer row and should be dropped.
+          \item \textbf{Inefficient \texttt{ALL} quantifier:} \texttt{m.rating >= ALL (SELECT rating FROM movies WHERE release\_year < 2000)} re-evaluates the inner query per row. Replacing it with \texttt{m.rating = (SELECT MAX(rating) FROM movies WHERE release\_year < 2000)} is semantically equivalent but computes the maximum once as a scalar.
+        \end{enumerate}
+      \end{solution}
+      \item (4 points)
+      \begin{solution}
+        \begin{lstlisting}
+SELECT m.id, m.title, m.rating,
+    (SELECT COUNT(DISTINCT c.person_id) FROM cast_in c
+     WHERE c.movie_id = m.id) AS actor_count
+FROM movies m
+WHERE m.release_year < 2000
+AND m.rating = (SELECT MAX(rating) FROM movies WHERE release_year < 2000)
+AND m.id NOT IN (SELECT c.movie_id FROM cast_in c
+                 JOIN people p2 ON c.person_id = p2.id
+                 WHERE p2.name = 'Tom Hanks')
+ORDER BY actor_count DESC, m.title;
+        \end{lstlisting}
+        \includegraphics[width=\textwidth]{q3a2_explain}
+      \end{solution}
+      \item (5 points)
+      \begin{solution}
+        \textbf{Total cost:} Andy's query has an estimated total cost of $\approx 2.12\times10^9$ compared to $\approx 8.29\times10^6$ for the improved query, roughly a 250$\times$ reduction. The dominant cost in Andy's plan is the correlated \texttt{actor\_count} subquery containing a redundant \texttt{Semi Join} on \texttt{cast\_in}, and the \texttt{>= ALL} subquery materialized per row. The improved query computes \texttt{MAX(rating)} once as an \texttt{InitPlan} (actual time 33ms) and pushes both \texttt{release\_year < 2000} and \texttt{rating = \$3} into the index condition on \texttt{movies\_release\_year\_and\_rating}, eliminating the full index scan for the rating filter.
+
+        \textbf{Estimated rows:} Andy's plan estimates 35,927 rows in the result; the improved plan estimates 359. The improved estimate is much tighter because the \texttt{MAX} scalar is resolved before planning, allowing the optimizer to use selectivity on \texttt{rating = \$3}.
+
+        \textbf{Indexes used:} Both plans use \texttt{movies\_release\_year\_and\_rating} and \texttt{cast\_in\_pkey}. The improved plan additionally uses \texttt{movies\_release\_year\_and\_rating} for the \texttt{MAX} aggregate via an index-only scan (0 heap fetches), and eliminates the \texttt{genres\_pkey} index scan entirely by removing the unnecessary \texttt{movie\_genres} join.
+
+        \textbf{Actual rows returned:} 6 rows.
+      \end{solution}
+    \end{enumerate}
+    \pagebreak
+  \part \text{Understanding indexes (20 points)}
+  \begin{enumerate}
+    \item (5 points)
+    \begin{solution}
+      \begin{enumerate}
+        \renewcommand{\labelenumi}{\roman{enumi}.}
+        \item \textbf{Key index:} \texttt{movies\_pkey} on column \texttt{id} (unique).
+        \item \textbf{Non-key indexes:}
+        \begin{itemize}
+          \item \texttt{movies\_num\_ratings}: (\texttt{num\_ratings})
+          \item \texttt{movies\_release\_year\_and\_rating}: (\texttt{release\_year}, \texttt{rating})
+          \item \texttt{movies\_title\_and\_runtime}: (\texttt{title}, \texttt{runtime})
+        \end{itemize}
+      \end{enumerate}
+    \end{solution}
+    \item (15 points)
+    \begin{solution}
+      \begin{enumerate}
+        \renewcommand{\labelenumi}{\roman{enumi}.}
+        \item \textbf{Query:} \lstinline|SELECT release_year FROM movies WHERE title = 'The Matrix'|\\
+        \textbf{Index used:} \texttt{movies\_title\_and\_runtime} on \texttt{(title, runtime)}.\\
+        \textbf{Comparison:} Without the index, Postgres performs a parallel sequential scan over all 395K rows (actual time 30.8ms). With the index, Postgres uses an Index Scan (actual time 0.05ms, $\approx$600$\times$ faster). The index matches the equality search \texttt{title = `The Matrix'} since \texttt{title} is a prefix of the index's search key \texttt{(title, runtime)}. Since \texttt{release\_year} is not part of the index search key, Postgres must follow the record ID pointer from the index data entry to retrieve the full record, so an index-only scan is not possible.
+
+        \begin{lstlisting}[language={}, basicstyle=\tiny\ttfamily]
+-- With index
+Index Scan using movies_title_and_runtime on movies  (cost=0.42..8.44 rows=1 width=4) (actual time=0.031..0.032 rows=1 loops=1)
+  Index Cond: ((title)::text = 'The Matrix'::text)
+Execution Time: 0.049 ms
+
+-- Without index
+Gather  (cost=1000.00..6568.41 rows=1 width=4) (actual time=7.152..30.749 rows=1 loops=1)
+  ->  Parallel Seq Scan on movies  (cost=0.00..5568.31 rows=1 width=4) (actual time=9.701..14.768 rows=0 loops=3)
+        Filter: ((title)::text = 'The Matrix'::text)
+Execution Time: 30.776 ms
+        \end{lstlisting}
+
+        \item \textbf{Query:} \lstinline|SELECT rating FROM movies WHERE num_ratings > 100000|\\
+        \textbf{Index used:} \texttt{movies\_num\_ratings} on \texttt{(num\_ratings)}.\\
+        \textbf{Comparison:} Without the index, a parallel sequential scan takes 45.4ms to return 2458 rows. With the index, Postgres uses a Bitmap Index Scan followed by a Bitmap Heap Scan (actual time 3.2ms, $\approx$14$\times$ faster). The index matches the range search \texttt{num\_ratings > 100000} since \texttt{num\_ratings} is the index's search key. A bitmap scan is chosen over a plain index scan because many rows match; batching record ID lookups in physical page order is more efficient than following each record ID pointer individually.
+
+        \begin{lstlisting}[language={}, basicstyle=\tiny\ttfamily]
+-- With index
+Bitmap Heap Scan on movies  (cost=31.35..3403.00 rows=2442 width=12) (actual time=0.370..3.049 rows=2458 loops=1)
+  ->  Bitmap Index Scan on movies_num_ratings  (cost=0.00..30.74 rows=2442 width=0) (actual time=0.209..0.209 rows=2458 loops=1)
+        Index Cond: (num_ratings > 100000)
+Execution Time: 3.181 ms
+
+-- Without index
+Gather  (cost=1000.00..6812.51 rows=2442 width=12) (actual time=0.696..45.285 rows=2458 loops=1)
+  ->  Parallel Seq Scan on movies  (cost=0.00..5568.31 rows=1018 width=12) (actual time=0.151..31.041 rows=819 loops=3)
+        Filter: (num_ratings > 100000)
+Execution Time: 45.419 ms
+        \end{lstlisting}
+
+        \item \textbf{Query:} \lstinline|SELECT COUNT(*) FROM movies WHERE release_year BETWEEN 2000 AND 2005|\\
+        \textbf{Index used:} \texttt{movies\_release\_year\_and\_rating} on \texttt{(release\_year, rating)}.\\
+        \textbf{Comparison:} Without the index, a parallel sequential scan with aggregation takes 46.9ms. With the index, Postgres uses an Index Only Scan (actual time 41.3ms). The index matches the range search on \texttt{release\_year} since it is the leading column of the index's search key \texttt{(release\_year, rating)}.
+
+        This scan type differs from queries (i) and (ii) because of what data the query requires. In query (i), \texttt{release\_year} is not part of the index search key, so Postgres must follow each record ID pointer from the index data entry to the full data record to retrieve it. In query (ii), many rows match a range predicate, so Postgres builds a bitmap of matching record IDs and fetches the corresponding data pages in physical order. In query (iii), \texttt{COUNT(*)} requires no column values at all beyond what is already stored in the B+ tree leaf pages. Since \texttt{release\_year} is in the index search key, the leaf pages alone contain all the information needed, so no record ID pointer is followed (0 heap fetches). This is the defining property of an index-only scan: the index is self-contained for the query, eliminating all data page I/Os. The speedup is modest since 27,918 rows match and all index leaf pages must still be scanned.
+
+        \begin{lstlisting}[language={}, basicstyle=\tiny\ttfamily]
+-- With index
+Aggregate  (cost=1095.30..1095.31 rows=1 width=8) (actual time=41.262..41.263 rows=1 loops=1)
+  ->  Index Only Scan using movies_release_year_and_rating on movies  (cost=0.42..1023.42 rows=28750 width=0) (actual time=0.043..39.036 rows=27918 loops=1)
+        Index Cond: ((release_year >= 2000) AND (release_year <= 2005))
+        Heap Fetches: 0
+Execution Time: 41.307 ms
+
+-- Without index
+Finalize Aggregate  (cost=7010.54..7010.55 rows=1 width=8) (actual time=46.762..46.833 rows=1 loops=1)
+  ->  Parallel Seq Scan on movies  (cost=0.00..5980.38 rows=11979 width=0) (actual time=0.610..26.986 rows=9306 loops=3)
+        Filter: ((release_year >= 2000) AND (release_year <= 2005))
+Execution Time: 46.866 ms
+        \end{lstlisting}
+      \end{enumerate}
+    \end{solution}
+  \end{enumerate}
+  \pagebreak
+  \part \text{(10 points)}
+  \begin{solution}
+    \textbf{Proposed index:} a B+ tree index on \texttt{people(name)}.
+
+    Andy's query contains the subquery \texttt{AND m.id NOT IN (SELECT c.movie\_id FROM cast\_in c JOIN people p2 ON c.person\_id = p2.id WHERE p2.name = `Tom Hanks')}. The EXPLAIN PLAN for Andy's query shows a Parallel Sequential Scan over all 411K rows of \texttt{people} filtered by \texttt{name = `Tom Hanks'}, since no index on \texttt{name} exists. An index on \texttt{people(name)} would match this equality search since \texttt{name} is the index's search key, allowing Postgres to locate the matching record via a direct B+ tree lookup rather than scanning the entire relation. This would eliminate the most expensive scan in the NOT IN subquery and reduce the cost of every execution of that subplan.
+  \end{solution}
+  \end{parts}
 \end{questions}
 \end{document}
