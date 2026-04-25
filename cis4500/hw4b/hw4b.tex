@@ -1,0 +1,104 @@
+\documentclass[12pt,letterpaper, onecolumn]{exam}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{listings}
+\usepackage[dvipsnames]{xcolor}
+\graphicspath{ {./images/} }
+\lhead{Mustafa Rashid\\}
+\rhead{Homework 4b: Relational DB Design\\}
+\chead{\hline} 
+\thispagestyle{empty} 
+\newcommand*{\setdef}[1]{\left\{#1 \right\}} 
+\renewcommand{\thepartno}{\arabic{partno}}
+\renewcommand{\thequestion}{\Alph{question}}
+\renewcommand{\partlabel}{\thepartno.}    % Format as A. B. C.
+
+\begin{document}
+\begingroup  
+\noindent\LARGE CIS 5500: Database and Information Systems\\
+\noindent\LARGE Homework 4b: Relational DB Design\\
+\noindent\large \today\\
+\noindent\large Mustafa Rashid\par
+\noindent\large Spring 2026\par
+\endgroup
+\rule{\textwidth}{0.4pt}
+\pointsdroppedatright
+\printanswers
+\renewcommand{\solutiontitle}{\noindent\textbf{Ans:}\enspace}
+
+% SQL listing from https://gist.githubusercontent.com/vivngo/e37e1c7b79bf7e8b910c6566c59c46be/raw/db8723fc80c8b1b01665851106dba2f370b5d865/code.tex
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{language=SQL,
+  basicstyle={\small\ttfamily},
+  belowskip=3mm,
+  breakatwhitespace=true,
+  breaklines=true,
+  classoffset=0,
+  columns=flexible,
+  commentstyle=\color{dkgreen},
+  framexleftmargin=0.25em,
+  frameshape={}{}{}{}, %To remove to vertical lines on left, set `frameshape={}{}{}{}`
+  keywordstyle=\color{blue},
+  numbers=none, %If you want line numbers, set `numbers=left`
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  stringstyle=\color{mauve},
+  tabsize=3,
+  xleftmargin =1em
+}
+
+\begin{questions}
+  \question \textbf{(14 points)}
+  \begin{parts}
+    \part Start at B1. Since $39 < 45$, go left to B2. In B2, since $35 \leq 39 < 40$, follow the pointer between 35 and 40 to B6. B6 contains $35^*$ and $38^*$ but not $39^*$, so the record is not found. Blocks read: B1, B2, B6.
+
+    \part Start at B1. Since $32 < 45$, go left to B2. In B2, since $25 \leq 32 < 35$, follow the pointer between 25 and 35 to B5. B5 contains $25^*$, $28^*$, $30^*$, none of which satisfy $\geq 32$. Scan right to B6, which contains $35^*$ and $38^*$ (both qualify). Continue right to B7, which contains $40^*$ and $42^*$ (both qualify). Stop since the next value ($45^*$) is not strictly less than 45. Blocks read: B1, B2, B5, B6, B7. Qualifying entries: $35^*$, $38^*$, $40^*$, $42^*$.
+
+    \part Navigate B1 $\to$ B2 $\to$ B4 (since $23 < 25$, follow the leftmost pointer in B2). B4 $= [15^*, 20^*]$ has 2 entries (below the maximum of 3), so $23^*$ is inserted directly without splitting. No structural changes occur; B4 becomes $[15^*, 20^*, 23^*]$.
+    \begin{center}
+    \includegraphics[width=\textwidth]{hw4b_23}
+    \end{center}
+
+    \part Navigate B1 $\to$ B3 $\to$ B9 (since $51 \geq 45$ and $51 \geq 50$). B9 $= [50^*, 55^*, 60^*]$ is full (3 entries). Inserting $51^*$ gives $[50^*, 51^*, 55^*, 60^*]$ (overflow). \textbf{Split B9}: left B9 $\leftarrow [50^*, 51^*]$, new block B10 $\leftarrow [55^*, 60^*]$; push key $55$ up to B3. B3 $= [50]$ becomes $[50, 55]$ with children B8, B9, B10 (2 keys; no overflow).
+    \begin{center}
+    \includegraphics[width=\textwidth]{hw4b_51}
+    \end{center}
+
+    \part Navigate B1 $\to$ B2 $\to$ B5 (since $25 \leq 34 < 35$). B5 $= [25^*, 28^*, 30^*]$ is full. Inserting $34^*$ gives $[25^*, 28^*, 30^*, 34^*]$ (overflow). \textbf{Split B5}: left B5 $\leftarrow [25^*, 28^*]$, new B10 $\leftarrow [30^*, 34^*]$; push $30$ up to B2. B2 $= [25, 35, 40]$ becomes $[25, 30, 35, 40]$ (overflow). \textbf{Split B2}: push $35$ up to B1; left B2 $\leftarrow [25, 30]$ with children B4, B5, B10; new B11 $\leftarrow [40]$ with children B6, B7. B1 $= [45]$ becomes $[35, 45]$ with children B2, B11, B3 (no overflow).
+    \begin{center}
+    \includegraphics[width=\textwidth]{hw4b_34}
+    \end{center}
+
+    \part Navigate B1 $\to$ B3 $\to$ B8 (since $49 \geq 45$ and $49 < 50$). B8 $= [45^*, 47^*, 49^*]$ has 3 entries; removing $49^*$ leaves B8 $= [45^*, 47^*]$ (2 entries $=$ min; no underflow). No structural changes.
+    \begin{center}
+    \includegraphics[width=\textwidth]{hw4b_49}
+    \end{center}
+
+    \part Navigate B1 $\to$ B2 $\to$ B6 (since $35 \leq 35 < 40$). B6 $= [35^*, 38^*]$ is at minimum (2 entries); removing $35^*$ leaves B6 $= [38^*]$ (underflow). Right sibling B7 $= [40^*, 42^*]$ is at minimum and cannot lend. Left sibling B5 $= [25^*, 28^*, 30^*]$ has 3 entries and can lend. \textbf{Borrow from B5}: move $30^*$ to B6. B5 $\leftarrow [25^*, 28^*]$, B6 $\leftarrow [30^*, 38^*]$. Update separator between B5 and B6 in B2 from $35$ to $30$: B2 $= [25, 30, 40]$ (no underflow).
+    \begin{center}
+    \includegraphics[width=\textwidth]{hw4b_35}
+    \end{center}
+  \end{parts}
+
+  \question \textbf{(6 points)}
+  \textbf{Answer: } 12
+
+Because all inserted values are $\ge 45$, every insertion goes into the rightmost subtree. To increase the height, we must overflow the root, which requires adding 3 new keys to it.
+
+Consider node $B3$, which initially has 1 key (2 children). To make it split and push a key up to the root, it must reach 4 keys, i.e., gain 3 new keys. Its two children ($B8$ and $B9$) are full, so the first two leaf splits take 1 insertion each. After these splits, new leaves have only 2 entries, so the next split requires 2 insertions. 
+
+Thus, producing one key for the root costs
+\[
+1 + 1 + 2 = 4
+\]
+insertions.
+
+Since the root needs 3 additional keys to overflow, the total number of insertions required is
+\[
+3 \times 4 = 12.
+\]
+\end{questions}
+\end{document}

@@ -13,3 +13,4 @@ cs355/
 /cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/binding.Makefile
 /cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/config.gypi
 /cis4500/hw4ec/hw4a-ec-student-version/node_modules/better-sqlite3/build/test_extension.target.mk
+infinite.c
