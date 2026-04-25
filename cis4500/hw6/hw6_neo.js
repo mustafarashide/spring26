@@ -18,7 +18,13 @@ RETURN `destination city`, outbound_code, return_code, waiting_time
 ORDER BY waiting_time ASC`
 
 // Question 6
-var answer_6 = ``
+var answer_6 = `MATCH (start:City),(end:City)
+WHERE start <> end
+MATCH p=shortestPath((start)-[:HAS_FLIGHT|FLYING_TO*..12]-(end))
+WITH start,p,nodes(p) AS all_nodes
+WITH start.name AS city_name, size([n IN all_nodes WHERE n:Flight]) AS flight_count
+RETURN city_name, round(avg(flight_count),2) AS avg_path_length
+ORDER BY avg_path_length ASC`
 
 // DO NOT MODIFY BELOW THIS LINE
 module.exports = { answer_4, answer_5, answer_6 }
